@@ -10,13 +10,40 @@ namespace TimeCard
 {
 	public partial class TimeCardForm : Form
 	{
-		private DayTimeCard m_timeCard;
+		private DayShifts m_timeCard;
 		private bool IsWorking = false;
 
 		public TimeCardForm()
 		{
 			InitializeComponent();
-			m_timeCard = new DayTimeCard(LoadReport(DateTime.Now));
+			m_timeCard = new DayShifts(LoadReport(DateTime.Now));
+			RefreshShiftsDisplay();
+
+			Timer tmr = new Timer();
+			tmr.Interval = 1000;   // milliseconds
+			tmr.Tick += Tmr_Tick;  // set handler
+			tmr.Start();
+		}
+
+		private void Tmr_Tick(object sender, EventArgs e)  //run this logic each timer tick
+		{
+			if (IsWorking)
+			{
+				TimeSpan span = new TimeSpan();
+				for (int i = 0; i < m_timeCard.Shifts.Count; i++)
+				{
+					DayShifts.WorkingShift shift = m_timeCard.Shifts[i];
+					if (shift.end != DateTime.MinValue)
+					{
+						span += shift.GetSpan();
+					}
+					else
+					{
+						span += DateTime.Now - shift.begin;
+					}
+				}
+				TimeSpanInDayText.Text = span.ToString(@"dd\.hh\:mm\:ss");
+			}
 		}
 
 		public string DateToString(DateTime date, char separator)
@@ -37,9 +64,36 @@ namespace TimeCard
 			{
 				m_timeCard.EndCurrentShift();
 			}
+			RefreshShiftsDisplay();
 		}
 
-		private string SaveReport(DateTime dT)
+		private void RefreshShiftsDisplay()
+		{
+			ShiftsList.Text = string.Empty;
+			TimeSpan span = new TimeSpan();
+			for (int i = 0; i < m_timeCard.Shifts.Count; i++)
+			{
+				DayShifts.WorkingShift shift = m_timeCard.Shifts[i];
+				ShiftsList.AppendText($"{shift.begin.ToLongTimeString()}");
+				if (shift.end != DateTime.MinValue)
+				{
+					span += shift.GetSpan();
+					ShiftsList.AppendText($" -> {shift.end.ToLongTimeString()}");
+				}
+				else
+				{
+					span += DateTime.Now - shift.begin;
+					ShiftsList.AppendText($"(current)");
+				}
+				if (i < m_timeCard.Shifts.Count - 1)
+				{
+					ShiftsList.Text += Environment.NewLine;
+				}
+			}
+			TimeSpanInDayText.Text = span.ToString(@"dd\.hh\:mm\:ss");
+		}
+
+		private string SaveReport()
 		{
 			DateTime dateToSend = DateTime.Now;
 			string textToSend = m_timeCard.ToString();
@@ -79,5 +133,16 @@ namespace TimeCard
 			return textReaded;
 		}
 
+		private void SaveButton_Click(object sender, EventArgs e)
+		{
+			SaveReport();
+		}
+
+		private void LoadButton_Click(object sender, EventArgs e)
+		{
+			m_timeCard = new DayShifts(LoadReport(DateTime.Now));
+
+			RefreshShiftsDisplay();
+		}
 	}
 }

@@ -4,9 +4,9 @@ using System.Linq;
 
 namespace TimeCard.Datas
 {
-	public class DayTimeCard
+	public class DayShifts
 	{
-		public DayTimeCard(string reportLoaded)
+		public DayShifts(string reportLoaded)
 		{
 			if (!string.IsNullOrEmpty(reportLoaded))
 			{
@@ -14,13 +14,23 @@ namespace TimeCard.Datas
 
 				foreach (string shiftLine in shiftsLines)
 				{
-					WorkingShift info = new WorkingShift();
-					if (DateTime.TryParse(shiftLine.Substring(6, shiftLine.IndexOf(',')), out DateTime begin))
+					if (shiftLine.Length > 6)
 					{
-						info.begin = begin;
-					}
+						WorkingShift info = new WorkingShift();
+						int endTimeBeginIndex = shiftLine.IndexOf(',');
+						string beginString = shiftLine.Substring(6, endTimeBeginIndex - 6);
 
-					m_workShifts.Add(info);
+						if (DateTime.TryParse(beginString, out DateTime begin))
+						{
+							info.begin = begin;
+							string endString = shiftLine.Substring(endTimeBeginIndex + 5);
+							if (DateTime.TryParse(endString, out DateTime end))
+							{
+								info.end = end;
+								m_workShifts.Add(info);
+							}
+						}
+					}
 				}
 
 			}
@@ -48,12 +58,18 @@ namespace TimeCard.Datas
 			m_workShifts[m_workShifts.Count - 1].end = DateTime.Now;
 		}
 
-		private class WorkingShift
+		public class WorkingShift
 		{
 			public DateTime begin;
 			public DateTime end;
-		}
 
+			public TimeSpan GetSpan()
+			{
+				return end - begin;
+			}
+
+		}
+		public List<WorkingShift> Shifts => m_workShifts;
 		private List<WorkingShift> m_workShifts = new List<WorkingShift>();
 	}
 }

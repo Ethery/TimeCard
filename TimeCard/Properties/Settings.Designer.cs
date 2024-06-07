@@ -22,5 +22,29 @@ namespace TimeCard.Properties {
                 return defaultInstance;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ColumnHeader")]
+        public string Begin {
+            get {
+                return ((string)(this["Begin"]));
+            }
+            set {
+                this["Begin"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("ColumnHeader")]
+        public string End {
+            get {
+                return ((string)(this["End"]));
+            }
+            set {
+                this["End"] = value;
+            }
+        }
     }
 }
