@@ -6,6 +6,17 @@ namespace TimeCard.Datas
 {
 	public class DayShifts
 	{
+		private const string IS_RUNNING_KEY = "IsRunning";
+		public WorkingShift LastShift
+		{
+			get
+			{
+				if (m_workShifts.Count > 0)
+					return m_workShifts[m_workShifts.Count - 1];
+				else return null;
+			}
+		}
+
 		public DayShifts(string reportLoaded)
 		{
 			if (!string.IsNullOrEmpty(reportLoaded))
@@ -24,11 +35,15 @@ namespace TimeCard.Datas
 						{
 							info.begin = begin;
 							string endString = shiftLine.Substring(endTimeBeginIndex + 5);
-							if (DateTime.TryParse(endString, out DateTime end))
+							if (!endString.Contains(IS_RUNNING_KEY))
 							{
-								info.end = end;
-								m_workShifts.Add(info);
+								if (DateTime.TryParse(endString, out DateTime end))
+								{
+									info.end = end;
+								}
 							}
+
+							m_workShifts.Add(info);
 						}
 					}
 				}
@@ -41,7 +56,15 @@ namespace TimeCard.Datas
 			string str = string.Empty;
 			foreach (WorkingShift shift in m_workShifts)
 			{
-				str += $"begin:{shift.begin},end:{shift.end}\n";
+				str += $"begin:{shift.begin},end:";
+				if (shift.IsRunning)
+				{
+					str += $"{shift.end}\n";
+				}
+				else
+				{
+					str += $"{IS_RUNNING_KEY}\n";
+				}
 			}
 			return str;
 		}
@@ -62,6 +85,7 @@ namespace TimeCard.Datas
 		{
 			public DateTime begin;
 			public DateTime end;
+			public bool IsRunning => end == DateTime.MinValue;
 
 			public TimeSpan GetSpan()
 			{

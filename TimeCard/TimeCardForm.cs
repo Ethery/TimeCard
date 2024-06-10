@@ -12,17 +12,28 @@ namespace TimeCard
 	{
 		private DayShifts m_timeCard;
 		private bool IsWorking = false;
-
+		private bool IsInitialized = false;
 		public TimeCardForm()
 		{
 			InitializeComponent();
-			m_timeCard = new DayShifts(LoadReport(DateTime.Now));
-			RefreshShiftsDisplay();
+
+			TimeSpanInDayText.Text = TimeSpan.MinValue.ToString();
+
+			LoadCurrentDayShift();
 
 			Timer tmr = new Timer();
 			tmr.Interval = 1000;   // milliseconds
 			tmr.Tick += Tmr_Tick;  // set handler
 			tmr.Start();
+			IsInitialized = true;
+		}
+
+		private void LoadCurrentDayShift()
+		{
+			m_timeCard = new DayShifts(LoadReport(DateTime.Now));
+			IsWorking = m_timeCard.LastShift != null && m_timeCard.LastShift.IsRunning;
+			IsWorkingCheckBox.Checked = IsWorking;
+			RefreshShiftsDisplay();
 		}
 
 		private void Tmr_Tick(object sender, EventArgs e)  //run this logic each timer tick
@@ -33,7 +44,7 @@ namespace TimeCard
 				for (int i = 0; i < m_timeCard.Shifts.Count; i++)
 				{
 					DayShifts.WorkingShift shift = m_timeCard.Shifts[i];
-					if (shift.end != DateTime.MinValue)
+					if (!shift.IsRunning)
 					{
 						span += shift.GetSpan();
 					}
@@ -55,16 +66,19 @@ namespace TimeCard
 
 		private void IsWorkingCheckBox_CheckedChanged(object sender, EventArgs e)
 		{
-			IsWorking = IsWorkingCheckBox.Checked;
-			if (IsWorking)
+			if (IsInitialized)
 			{
-				m_timeCard.BeginNewShift();
+				IsWorking = IsWorkingCheckBox.Checked;
+				if (IsWorking)
+				{
+					m_timeCard.BeginNewShift();
+				}
+				else
+				{
+					m_timeCard.EndCurrentShift();
+				}
+				RefreshShiftsDisplay();
 			}
-			else
-			{
-				m_timeCard.EndCurrentShift();
-			}
-			RefreshShiftsDisplay();
 		}
 
 		private void RefreshShiftsDisplay()
@@ -75,7 +89,7 @@ namespace TimeCard
 			{
 				DayShifts.WorkingShift shift = m_timeCard.Shifts[i];
 				ShiftsList.AppendText($"{shift.begin.ToLongTimeString()}");
-				if (shift.end != DateTime.MinValue)
+				if (!shift.IsRunning)
 				{
 					span += shift.GetSpan();
 					ShiftsList.AppendText($" -> {shift.end.ToLongTimeString()}");
@@ -140,9 +154,7 @@ namespace TimeCard
 
 		private void LoadButton_Click(object sender, EventArgs e)
 		{
-			m_timeCard = new DayShifts(LoadReport(DateTime.Now));
-
-			RefreshShiftsDisplay();
+			LoadCurrentDayShift();
 		}
 	}
 }
