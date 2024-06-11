@@ -34,6 +34,8 @@ namespace TimeCard
 			this.ShiftsList = new System.Windows.Forms.TextBox();
 			this.label1 = new System.Windows.Forms.Label();
 			this.TimeSpanInDayText = new System.Windows.Forms.Label();
+			this.TimeSpanInWeekWithoutTodayText = new System.Windows.Forms.Label();
+			this.TimeSpanInWeekText = new System.Windows.Forms.Label();
 			this.SuspendLayout();
 			// 
 			// IsWorkingCheckBox
@@ -49,7 +51,7 @@ namespace TimeCard
 			this.IsWorkingCheckBox.FlatAppearance.MouseOverBackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(128)))), ((int)(((byte)(0)))));
 			this.IsWorkingCheckBox.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
 			this.IsWorkingCheckBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 20F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-			this.IsWorkingCheckBox.Location = new System.Drawing.Point(205, 35);
+			this.IsWorkingCheckBox.Location = new System.Drawing.Point(102, 12);
 			this.IsWorkingCheckBox.Name = "IsWorkingCheckBox";
 			this.IsWorkingCheckBox.Size = new System.Drawing.Size(228, 46);
 			this.IsWorkingCheckBox.TabIndex = 0;
@@ -59,7 +61,8 @@ namespace TimeCard
 			// 
 			// SaveButton
 			// 
-			this.SaveButton.Location = new System.Drawing.Point(576, 12);
+			this.SaveButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.SaveButton.Location = new System.Drawing.Point(336, 269);
 			this.SaveButton.Name = "SaveButton";
 			this.SaveButton.Size = new System.Drawing.Size(75, 23);
 			this.SaveButton.TabIndex = 1;
@@ -69,7 +72,8 @@ namespace TimeCard
 			// 
 			// LoadButton
 			// 
-			this.LoadButton.Location = new System.Drawing.Point(567, 515);
+			this.LoadButton.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
+			this.LoadButton.Location = new System.Drawing.Point(336, 298);
 			this.LoadButton.Name = "LoadButton";
 			this.LoadButton.Size = new System.Drawing.Size(75, 23);
 			this.LoadButton.TabIndex = 2;
@@ -81,18 +85,20 @@ namespace TimeCard
 			// 
 			this.ShiftsList.AcceptsReturn = true;
 			this.ShiftsList.AcceptsTab = true;
-			this.ShiftsList.Location = new System.Drawing.Point(12, 117);
+			this.ShiftsList.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
+			this.ShiftsList.Location = new System.Drawing.Point(12, 110);
 			this.ShiftsList.Multiline = true;
 			this.ShiftsList.Name = "ShiftsList";
 			this.ShiftsList.ReadOnly = true;
-			this.ShiftsList.Size = new System.Drawing.Size(538, 421);
+			this.ShiftsList.Size = new System.Drawing.Size(226, 212);
 			this.ShiftsList.TabIndex = 3;
 			this.ShiftsList.WordWrap = false;
 			// 
 			// label1
 			// 
+			this.label1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
 			this.label1.AutoSize = true;
-			this.label1.Location = new System.Drawing.Point(12, 98);
+			this.label1.Location = new System.Drawing.Point(12, 90);
 			this.label1.Name = "label1";
 			this.label1.Size = new System.Drawing.Size(33, 13);
 			this.label1.TabIndex = 4;
@@ -100,16 +106,39 @@ namespace TimeCard
 			// 
 			// TimeSpanInDayText
 			// 
-			this.TimeSpanInDayText.AutoSize = true;
-			this.TimeSpanInDayText.Location = new System.Drawing.Point(453, 97);
+			this.TimeSpanInDayText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.TimeSpanInDayText.Location = new System.Drawing.Point(250, 117);
 			this.TimeSpanInDayText.Name = "TimeSpanInDayText";
-			this.TimeSpanInDayText.Size = new System.Drawing.Size(83, 13);
+			this.TimeSpanInDayText.Size = new System.Drawing.Size(171, 13);
 			this.TimeSpanInDayText.TabIndex = 5;
 			this.TimeSpanInDayText.Text = "TimeSpanInDay";
+			this.TimeSpanInDayText.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// TimeSpanInWeekWithoutTodayText
+			// 
+			this.TimeSpanInWeekWithoutTodayText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.TimeSpanInWeekWithoutTodayText.Location = new System.Drawing.Point(244, 142);
+			this.TimeSpanInWeekWithoutTodayText.Name = "TimeSpanInWeekWithoutTodayText";
+			this.TimeSpanInWeekWithoutTodayText.Size = new System.Drawing.Size(177, 13);
+			this.TimeSpanInWeekWithoutTodayText.TabIndex = 6;
+			this.TimeSpanInWeekWithoutTodayText.Text = "TimeSpanInWeekWithoutToday";
+			this.TimeSpanInWeekWithoutTodayText.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
+			// 
+			// TimeSpanInWeekText
+			// 
+			this.TimeSpanInWeekText.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
+			this.TimeSpanInWeekText.Location = new System.Drawing.Point(247, 172);
+			this.TimeSpanInWeekText.Name = "TimeSpanInWeekText";
+			this.TimeSpanInWeekText.Size = new System.Drawing.Size(174, 13);
+			this.TimeSpanInWeekText.TabIndex = 7;
+			this.TimeSpanInWeekText.Text = "TimeSpanInWeek";
+			this.TimeSpanInWeekText.TextAlign = System.Drawing.ContentAlignment.MiddleRight;
 			// 
 			// TimeCardForm
 			// 
-			this.ClientSize = new System.Drawing.Size(663, 550);
+			this.ClientSize = new System.Drawing.Size(423, 333);
+			this.Controls.Add(this.TimeSpanInWeekText);
+			this.Controls.Add(this.TimeSpanInWeekWithoutTodayText);
 			this.Controls.Add(this.TimeSpanInDayText);
 			this.Controls.Add(this.label1);
 			this.Controls.Add(this.ShiftsList);
@@ -117,6 +146,7 @@ namespace TimeCard
 			this.Controls.Add(this.SaveButton);
 			this.Controls.Add(this.IsWorkingCheckBox);
 			this.Name = "TimeCardForm";
+			this.FormClosed += new System.Windows.Forms.FormClosedEventHandler(this.TimeCardForm_FormClosed);
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -129,5 +159,7 @@ namespace TimeCard
 		private System.Windows.Forms.TextBox ShiftsList;
 		private System.Windows.Forms.Label label1;
 		private System.Windows.Forms.Label TimeSpanInDayText;
+		private System.Windows.Forms.Label TimeSpanInWeekWithoutTodayText;
+		private System.Windows.Forms.Label TimeSpanInWeekText;
 	}
 }

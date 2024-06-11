@@ -7,6 +7,7 @@ namespace TimeCard.Datas
 	public class DayShifts
 	{
 		private const string IS_RUNNING_KEY = "IsRunning";
+
 		public WorkingShift LastShift
 		{
 			get
@@ -51,6 +52,24 @@ namespace TimeCard.Datas
 			}
 		}
 
+		public TimeSpan TimeSpendInDay()
+		{
+			TimeSpan span = new TimeSpan();
+			for (int i = 0; i < m_workShifts.Count; i++)
+			{
+				DayShifts.WorkingShift shift = m_workShifts[i];
+				if (!shift.IsRunning)
+				{
+					span += shift.GetSpan();
+				}
+				else
+				{
+					span += DateTime.Now - shift.begin;
+				}
+			}
+			return span;
+		}
+
 		public override string ToString()
 		{
 			string str = string.Empty;
@@ -93,6 +112,7 @@ namespace TimeCard.Datas
 			}
 
 		}
+
 		public List<WorkingShift> Shifts => m_workShifts;
 		private List<WorkingShift> m_workShifts = new List<WorkingShift>();
 	}

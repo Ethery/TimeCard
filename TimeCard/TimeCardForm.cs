@@ -2,7 +2,11 @@
 // This tool is designed to personnal use only.
 
 using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Globalization;
 using System.IO;
+using System.Linq;
 using System.Windows.Forms;
 using TimeCard.Datas;
 
@@ -10,7 +14,7 @@ namespace TimeCard
 {
 	public partial class TimeCardForm : Form
 	{
-		private DayShifts m_timeCard;
+		private DayShifts m_currentDayTimeCard;
 		private bool IsWorking = false;
 		private bool IsInitialized = false;
 		public TimeCardForm()
@@ -28,10 +32,16 @@ namespace TimeCard
 			IsInitialized = true;
 		}
 
+		protected override void OnClosing(CancelEventArgs e)
+		{
+			base.OnClosing(e);
+			SaveReport();
+		}
+
 		private void LoadCurrentDayShift()
 		{
-			m_timeCard = new DayShifts(LoadReport(DateTime.Now));
-			IsWorking = m_timeCard.LastShift != null && m_timeCard.LastShift.IsRunning;
+			m_currentDayTimeCard = new DayShifts(LoadReport(DateTime.Today));
+			IsWorking = m_currentDayTimeCard.LastShift != null && m_currentDayTimeCard.LastShift.IsRunning;
 			IsWorkingCheckBox.Checked = IsWorking;
 			RefreshShiftsDisplay();
 		}
@@ -40,20 +50,7 @@ namespace TimeCard
 		{
 			if (IsWorking)
 			{
-				TimeSpan span = new TimeSpan();
-				for (int i = 0; i < m_timeCard.Shifts.Count; i++)
-				{
-					DayShifts.WorkingShift shift = m_timeCard.Shifts[i];
-					if (!shift.IsRunning)
-					{
-						span += shift.GetSpan();
-					}
-					else
-					{
-						span += DateTime.Now - shift.begin;
-					}
-				}
-				TimeSpanInDayText.Text = span.ToString(@"dd\.hh\:mm\:ss");
+				RefreshTimers();
 			}
 		}
 
@@ -68,49 +65,85 @@ namespace TimeCard
 		{
 			if (IsInitialized)
 			{
-				IsWorking = IsWorkingCheckBox.Checked;
-				if (IsWorking)
+				if (IsWorking != IsWorkingCheckBox.Checked)
 				{
-					m_timeCard.BeginNewShift();
+					IsWorking = IsWorkingCheckBox.Checked;
+					if (IsWorking)
+					{
+						m_currentDayTimeCard.BeginNewShift();
+					}
+					else
+					{
+						m_currentDayTimeCard.EndCurrentShift();
+					}
+					RefreshShiftsDisplay();
+
+					SaveReport();
 				}
-				else
-				{
-					m_timeCard.EndCurrentShift();
-				}
-				RefreshShiftsDisplay();
 			}
+		}
+
+		private void RefreshTimers()
+		{
+			TimeSpanInDayText.Text = $"Today : {m_currentDayTimeCard.TimeSpendInDay().ToString(@"dd\.hh\:mm\:ss")}";
+			TimeSpanInWeekWithoutTodayText.Text = $"Week (without today) : {GetTimeSpendInWholeWeekWithoutToday().ToString(@"dd\.hh\:mm\:ss")}";
+			TimeSpanInWeekText.Text = $"Whole week : {(GetTimeSpendInWholeWeekWithoutToday() + m_currentDayTimeCard.TimeSpendInDay()).ToString(@"dd\.hh\:mm\:ss")}";
 		}
 
 		private void RefreshShiftsDisplay()
 		{
 			ShiftsList.Text = string.Empty;
-			TimeSpan span = new TimeSpan();
-			for (int i = 0; i < m_timeCard.Shifts.Count; i++)
+			for (int i = 0; i < m_currentDayTimeCard.Shifts.Count; i++)
 			{
-				DayShifts.WorkingShift shift = m_timeCard.Shifts[i];
+				DayShifts.WorkingShift shift = m_currentDayTimeCard.Shifts[i];
 				ShiftsList.AppendText($"{shift.begin.ToLongTimeString()}");
 				if (!shift.IsRunning)
 				{
-					span += shift.GetSpan();
-					ShiftsList.AppendText($" -> {shift.end.ToLongTimeString()}");
+					ShiftsList.AppendText($" -- {shift.end.ToLongTimeString()}");
 				}
 				else
 				{
-					span += DateTime.Now - shift.begin;
-					ShiftsList.AppendText($"(current)");
+					ShiftsList.AppendText($" -- (current)");
 				}
-				if (i < m_timeCard.Shifts.Count - 1)
+				if (i < m_currentDayTimeCard.Shifts.Count - 1)
 				{
 					ShiftsList.Text += Environment.NewLine;
 				}
 			}
-			TimeSpanInDayText.Text = span.ToString(@"dd\.hh\:mm\:ss");
+			RefreshTimers();
+		}
+
+		private TimeSpan GetTimeSpendInWholeWeekWithoutToday()
+		{
+			DateTime startOfWeek = DateTime.Today.AddDays(
+			(int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek -
+			(int)DateTime.Today.DayOfWeek);
+
+			List<DateTime> weekDates = new List<DateTime>(Enumerable.Range(0, 7).Select(i => startOfWeek.AddDays(i)));
+
+			TimeSpan totalTimeSpan = new TimeSpan();
+			foreach (DateTime dayOfWeek in weekDates)
+			{
+				if (dayOfWeek != DateTime.Today)
+				{
+					string reportContent = LoadReport(dayOfWeek);
+					if (!string.IsNullOrEmpty(reportContent))
+					{
+						DayShifts dayTimeCard = new DayShifts(reportContent);
+						if (!dayTimeCard.LastShift.IsRunning)
+						{
+							totalTimeSpan += dayTimeCard.TimeSpendInDay();
+						}
+					}
+				}
+			}
+			return totalTimeSpan;
 		}
 
 		private string SaveReport()
 		{
-			DateTime dateToSend = DateTime.Now;
-			string textToSend = m_timeCard.ToString();
+			DateTime dateToSend = DateTime.Today;
+			string textToSend = m_currentDayTimeCard.ToString();
 			if (!Directory.Exists("ReportsBodys"))
 				Directory.CreateDirectory("ReportsBodys");
 
@@ -155,6 +188,11 @@ namespace TimeCard
 		private void LoadButton_Click(object sender, EventArgs e)
 		{
 			LoadCurrentDayShift();
+		}
+
+		private void TimeCardForm_FormClosed(object sender, FormClosedEventArgs e)
+		{
+			SaveReport();
 		}
 	}
 }
