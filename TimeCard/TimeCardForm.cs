@@ -29,6 +29,15 @@ namespace TimeCard
 			tmr.Interval = 1000;   // milliseconds
 			tmr.Tick += Tmr_Tick;  // set handler
 			tmr.Start();
+
+#if DEBUG
+			SaveButton.Enabled = true;
+			SaveButton.Enabled = true;
+#else
+			SaveButton.Dispose();
+			LoadButton.Dispose();
+#endif
+
 			IsInitialized = true;
 		}
 
