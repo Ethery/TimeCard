@@ -4,9 +4,6 @@ pipeline {
 			label 'Unity'
 		}
 	}
-	parameters {
-		
-	}
 	stages { 
 		stage('Create archive') {
 			steps {
