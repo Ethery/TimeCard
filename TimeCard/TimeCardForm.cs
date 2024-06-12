@@ -34,8 +34,8 @@ namespace TimeCard
 
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			base.OnClosing(e);
 			SaveReport();
+			base.OnClosing(e);
 		}
 
 		private void LoadCurrentDayShift()

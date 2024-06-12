@@ -76,7 +76,7 @@ namespace TimeCard.Datas
 			foreach (WorkingShift shift in m_workShifts)
 			{
 				str += $"begin:{shift.begin},end:";
-				if (shift.IsRunning)
+				if (!shift.IsRunning)
 				{
 					str += $"{shift.end}\n";
 				}
