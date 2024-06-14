@@ -149,18 +149,50 @@ namespace TimeCard
 			return totalTimeSpan;
 		}
 
-		private string SaveReport()
+		private void SaveReport()
 		{
-			DateTime dateToSend = DateTime.Today;
+			SaveReport(DateTime.Today);
+			SaveWeek();
+		}
+
+		private void SaveReport(DateTime dateToSave)
+		{
 			string textToSend = m_currentDayTimeCard.ToString();
 			if (!Directory.Exists("ReportsBodys"))
 				Directory.CreateDirectory("ReportsBodys");
 
-			StreamWriter writer = new StreamWriter("ReportsBodys\\[HS]Loïc MEUNIER[" + DateToString(dateToSend, '_') + "].txt");
+			StreamWriter writer = new StreamWriter("ReportsBodys\\[HS]Loïc MEUNIER[" + DateToString(dateToSave, '_') + "].txt");
 			writer.Write(textToSend);
 			writer.Dispose();
 			writer.Close();
-			return textToSend;
+
+			SaveWeek();
+		}
+
+		private void SaveWeek()
+		{
+			DateTime startOfWeek = DateTime.Today.AddDays(
+			(int)CultureInfo.CurrentCulture.DateTimeFormat.FirstDayOfWeek -
+			(int)DateTime.Today.DayOfWeek);
+
+			List<DateTime> weekDates = new List<DateTime>(Enumerable.Range(0, 7).Select(i => startOfWeek.AddDays(i)));
+
+			StreamWriter writer = new StreamWriter("ReportsBodys\\[HS][WEEKREPORT]Loïc MEUNIER[" + DateToString(startOfWeek, '_') + "].txt");
+			TimeSpan totalTimeSpan = new TimeSpan();
+			foreach (DateTime dayOfWeek in weekDates)
+			{
+				string reportContent = LoadReport(dayOfWeek);
+				if (!string.IsNullOrEmpty(reportContent))
+				{
+					DayShifts dayTimeCard = new DayShifts(reportContent);
+					writer.Write(dayTimeCard.ToString());
+					TimeSpan span = dayTimeCard.TimeSpendInDay();
+					writer.WriteLine(span + "\n");
+					totalTimeSpan += span;
+				}
+			}
+			writer.Dispose();
+			writer.Close();
 		}
 
 		private string LoadReport(DateTime dT)
