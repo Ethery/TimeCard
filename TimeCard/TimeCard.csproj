@@ -73,6 +73,7 @@
   <ItemGroup>
     <Compile Include="Datas\DayShifts.cs" />
     <Compile Include="Datas\Globals.cs" />
+    <Compile Include="TimeCardExtensions.cs" />
     <Compile Include="TimeCardForm.cs">
       <SubType>Form</SubType>
     </Compile>

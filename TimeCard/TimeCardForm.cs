@@ -94,9 +94,9 @@ namespace TimeCard
 
 		private void RefreshTimers()
 		{
-			TimeSpanInDayText.Text = $"Today : {m_currentDayTimeCard.TimeSpendInDay().ToString(@"dd\.hh\:mm\:ss")}";
-			TimeSpanInWeekWithoutTodayText.Text = $"Week (without today) : {GetTimeSpendInWholeWeekWithoutToday().ToString(@"dd\.hh\:mm\:ss")}";
-			TimeSpanInWeekText.Text = $"Whole week : {(GetTimeSpendInWholeWeekWithoutToday() + m_currentDayTimeCard.TimeSpendInDay()).ToString(@"dd\.hh\:mm\:ss")}";
+			TimeSpanInDayText.Text = $"Today : {m_currentDayTimeCard.TimeSpendInDay().FormatForTimeCard()}";
+			TimeSpanInWeekWithoutTodayText.Text = $"Week (without today) : {GetTimeSpendInWholeWeekWithoutToday().FormatForTimeCard()}";
+			TimeSpanInWeekText.Text = $"Whole week : {(GetTimeSpendInWholeWeekWithoutToday() + m_currentDayTimeCard.TimeSpendInDay()).FormatForTimeCard()}";
 		}
 
 		private void RefreshShiftsDisplay()
